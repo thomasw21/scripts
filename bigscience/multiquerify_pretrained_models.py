@@ -10,7 +10,7 @@ def main():
     head_dim = hidden_dim // num_heads
 
     epochs = 10000
-    learning_rate = 1e-1
+    learning_rate = 1e-2
 
     ORIGINAL_W_Qs = torch.stack([torch.rand(head_dim, hidden_dim) for _ in range(num_heads)], dim=0)
     ORIGINAL_W_Ks = torch.stack([torch.rand(head_dim, hidden_dim) for _ in range(num_heads)], dim=0)
@@ -40,8 +40,9 @@ def main():
     W_Qs.requires_grad = True
     W_K.requires_grad = True
 
-    optimizer = torch.optim.Adam([W_Qs, W_K], lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 1 / math.sqrt(iter + 1))
+    optimizer = torch.optim.AdamW([W_Qs, W_K], lr=learning_rate)
+    # optimizer = torch.optim.SGD([W_Qs, W_K], lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 1 )#/ math.sqrt(iter + 1))
 
     # Precomputed ORIGINAL_W_Qs 8 ORIGINAL_W_Ks
     precomputed_orignal_QK = torch.bmm(ORIGINAL_W_Qs.permute(0, 2, 1), ORIGINAL_W_Ks)

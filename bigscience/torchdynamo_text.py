@@ -16,7 +16,7 @@ def toy_example(a, b):
         b = b * -1
     return x * b
 
-def main():
+def test_transformers():
     model = AutoModel.from_pretrained("bert-base-uncased")
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
@@ -25,13 +25,22 @@ def main():
     # model.forward = optimized_model.forward
     # optimized_model = dynamo.optimize("inductor")(model)
 
-    for i in range(100):
-        random_text = "potato"
-        inputs_ids = tokenizer.encode(random_text, return_tensors="pt")
-
-        optimized_model(inputs_ids)
+    # for i in range(100):
+    #     random_text = "potato"
+    #     inputs_ids = tokenizer.encode(random_text, return_tensors="pt")
+    #
+    #     optimized_model(inputs_ids)
 
     pass
+
+def test_toy():
+    a = torch.rand(10)
+    b = torch.rand(10)
+    toy_example(a,b)
+
+def main():
+    test_transformers()
+    # test_toy()
 
 if __name__ == "__main__":
     main()
