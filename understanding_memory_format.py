@@ -2,8 +2,20 @@ import torch
 
 
 def main(device: torch.device = torch.device("cpu")):
-    x = torch.randn(2,3,5,7, device=device)
-    y = x.to(memory_format=torch.channels_last)
+    def get_1d_memory_buffer(tensor):
+        return "".join(hex(elt) for elt in tensor.storage().untyped().byte())
+
+    x = torch.randn(2,3)
+    y = torch.empty(3,2).transpose(0,1)
+
+    # Fill y with x data
+    y[:] = x
+
+    assert x.shape == y.shape
+    assert get_1d_memory_buffer(x) != get_1d_memory_buffer(y)
+
+    print("y", get_1d_memory_buffer(y))
+
 
     # Assert that they don't share memory
     do_share_memory = x.data_ptr() == y.data_ptr()
@@ -16,6 +28,7 @@ def main(device: torch.device = torch.device("cpu")):
     z = x.permute(0,2,3,1).contiguous()
     is_storage_equal = all(z_data == y_data for z_data, y_data in zip(z.storage(), y.storage()))
     print(f"Channels Last storage is the same as the NHWC format: {is_storage_equal}")
+    print(y.shape, x.shape)
 
     """
     This begs the question: why does pytorch not expose NHWC convolutions then? IMO it's a weird API
